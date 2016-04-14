@@ -11,6 +11,8 @@ public class adjacency {
         Edge[] edges = {new Edge("A","B",2), new Edge("A","D",1),new Edge("B","A",2), new Edge("B","D",2),
                 new Edge("C","D",3),new Edge("D","A",1),new Edge("D","B",2), new Edge("D","C",3)};
 
+
+        System.out.println("---- Adjacency Matrix ----\n");
         Integer[][] adjMatrix = makeAdjMatrix(verticies,edges);
         for(int i = 0; i < adjMatrix.length; i++){
 
@@ -20,29 +22,48 @@ public class adjacency {
             System.out.println("\n---------------");
         }
 
+        System.out.println("\n---- Adjacency List ----\n");
         HashMap<String, ArrayList<Edge>> adjList = new HashMap<>();
         adjList = makeAdjList(verticies, edges);
         for(String s : verticies){
             System.out.println(s + " --> " + adjList.get(s));
         }
 
-        printByWeightDescending(adjList);
-
+        for(String key : adjList.keySet()){
+            adjList.get(key).sort(new EdgeComparator());
+        }
+        String descending = printByWeightDescending(adjList, findMin(adjList), findMax(adjList));
+        System.out.println("\n---- Descending by edge weight ----\n");
+        System.out.println(descending);
     }
-    public static void printByWeightDescending(HashMap<String, ArrayList<Edge>> adjList){
-        HashMap<String, ArrayList<Edge>> adjListCopy = adjList;
-        for(String key : adjListCopy.keySet()){
-            adjListCopy.get(key).sort(new EdgeComparator());
-        }
-        for(String key : adjListCopy.keySet()){
-            for(int i = 0; i < adjListCopy.get(key).size(); i++){
 
-                if(adjListCopy.get(key).get(i).weight == findMax(adjListCopy)){
-                    System.out.println(adjListCopy.get(key).get(i).vert + adjListCopy.get(key).get(i));
-                    adjListCopy.get(key)
+
+
+    public static String printByWeightDescending(HashMap<String, ArrayList<Edge>> adjList, int min, int max){
+        String result = "";
+        if(min > max)
+            return "";
+        else{
+            result += printByWeightDescending(adjList, min+1, max);
+            for(String key : adjList.keySet()){
+                for(int i = 0; i < adjList.get(key).size(); i++){
+                    if(adjList.get(key).get(i).weight == min){
+                        result += "[" + adjList.get(key).get(i).vert + adjList.get(key).get(i) + "]";
+                    }
                 }
+
             }
+            return result;
         }
+    }
+    public static int findMin(HashMap<String, ArrayList<Edge>> adjListCopy){
+        int min = findMax(adjListCopy);
+        for(String key : adjListCopy.keySet())
+            for(Edge e : adjListCopy.get(key))
+                if(e.weight < min)
+                    min = e.weight;
+
+        return min;
     }
     public static int findMax(HashMap<String, ArrayList<Edge>> adjListCopy){
         int max = 0;
@@ -112,3 +133,20 @@ public class adjacency {
     }
 
 }
+/*
+
+HashMap<String, ArrayList<Edge>> adjListCopy = adjList;
+        for(String key : adjListCopy.keySet()){
+            adjListCopy.get(key).sort(new EdgeComparator());
+        }
+        for(String key : adjListCopy.keySet()){
+            for(int i = 0; i < adjListCopy.get(key).size(); i++){
+
+                if(adjListCopy.get(key).get(i).weight == findMax(adjListCopy)){
+                    System.out.println(adjListCopy.get(key).get(i).vert + adjListCopy.get(key).get(i));
+                    adjListCopy.get(key)
+                }
+            }
+        }
+
+ */
